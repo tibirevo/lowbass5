@@ -10,6 +10,61 @@ document.addEventListener('DOMContentLoaded', () => {
   const navGalleryBtn = document.getElementById('nav-gallery-btn');
   const navReviewsBtn = document.getElementById('nav-reviews-btn');
   const navContactBtn = document.getElementById('nav-contact-btn');
+  const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+  const headerNav = document.getElementById('header-nav') || document.querySelector('.header-nav');
+
+  // Mobile Hamburger Menu Toggle Controller
+  if (mobileMenuToggle && headerNav) {
+    function toggleMobileMenu(forceClose = false) {
+      const isCurrentlyOpen = mobileMenuToggle.classList.contains('open');
+      const shouldOpen = forceClose ? false : !isCurrentlyOpen;
+
+      mobileMenuToggle.classList.toggle('open', shouldOpen);
+      headerNav.classList.toggle('open', shouldOpen);
+      mobileMenuToggle.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+      mobileMenuToggle.setAttribute('aria-label', shouldOpen ? 'Închide meniul de navigare' : 'Deschide meniul de navigare');
+    }
+
+    mobileMenuToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleMobileMenu();
+    });
+
+    // Close mobile menu when tapping navigation links/buttons (except contact toggle)
+    const navItems = headerNav.querySelectorAll('.header-nav-btn, .terms-back-btn');
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        if (item.id !== 'nav-contact-btn') {
+          toggleMobileMenu(true);
+        }
+      });
+    });
+
+    // Close when clicking outside header
+    document.addEventListener('click', (e) => {
+      const studioHeader = document.querySelector('.studio-header');
+      if (studioHeader && !studioHeader.contains(e.target)) {
+        if (mobileMenuToggle.classList.contains('open')) {
+          toggleMobileMenu(true);
+        }
+      }
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && mobileMenuToggle.classList.contains('open')) {
+        toggleMobileMenu(true);
+      }
+    });
+
+    // Auto-close on viewport resize to desktop
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 768 && mobileMenuToggle.classList.contains('open')) {
+        toggleMobileMenu(true);
+      }
+    }, { passive: true });
+  }
 
   function smoothScrollTo(elementId) {
     const el = document.getElementById(elementId);
